@@ -1,5 +1,8 @@
+
 const express = require('express');
-const cors=require('cors')
+const cors = require('cors');
+const { MongoClient, ServerApiVersion } = require('mongodb');
+
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -7,10 +10,66 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+
+
+const uri = `mongodb+srv://node_mongo_crud:PqGGK01zrRf3DAj4@cluster0.fkjuk.mongodb.net/?retryWrites=true&w=majority`;
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
+
+
+async function run() {
+  try {
+    const client = new MongoClient(uri);
+    const crudCollection = client.db('node_mongo_crud').collection('users');
+    // create a document to insert
+    const user = {
+      name: 'mohonanodi',
+      email: 'sgsgh@gmail.com',
+    };
+    const result = await crudCollection.insertOne(user);
+    console.log(`A document was inserted with the _id: ${result.insertedId}`);
+  } finally {
+    
+  }
+}
+run().catch(console.dir);
+
+
+
+
+
+// async function run() {
+//   try {
+//     // Connect the client to the server	
+//     await client.connect();
+   
+//       const crudCollection = client.db('node_mongo_crud').collection('users');
+//     const user = { name: 'mohonanodi', email: 'sgsgh@gmail.com' }
+//     const result=await crudCollection.insertOne(user)
+//     console.log(`user inserted with id : ${result.insertedId}`);
+   
+//   } finally {
+    
+//   }
+// }
+// run().catch(console.dir);
+
+
+
+
 app.get('/', (req, res) => {
-    res.send('running at 5000');
+    res.send(
+        '<h1  style="color:red ;text-align:center ; margin:20% auto" >Hello from node mongo CRUD</h1>'
+    );
 });
 
 app.listen(port, () => {
-    console.log("CRUD server is running");
+    console.log(`Example app listening on port ${port}`);
 })
