@@ -28,13 +28,24 @@ async function run() {
   try {
     const client = new MongoClient(uri);
     const crudCollection = client.db('node_mongo_crud').collection('users');
-    // create a document to insert
-    const user = {
-      name: 'mohonanodi',
-      email: 'sgsgh@gmail.com',
-    };
-    const result = await crudCollection.insertOne(user);
-    console.log(`A document was inserted with the _id: ${result.insertedId}`);
+   
+
+    app.get('/user', async (req, res) => {
+      const query = {}
+      const cursor = crudCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+      
+    })
+
+    app.post('/user', async (req, res) => {
+      const user = req.body;
+      const result = await crudCollection.insertOne(user);
+      res.send(result);
+    })
+
+
+    
   } finally {
     
   }
