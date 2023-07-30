@@ -4,6 +4,7 @@ const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const mongoObjectId = require('mongodb').ObjectId;
 
+
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -31,26 +32,80 @@ async function run() {
     const crudCollection = client.db('node_mongo_crud').collection('users');
    
 
-    app.get('/user', async (req, res) => {
-      const query = {}
-      const cursor = crudCollection.find(query);
-      const result = await cursor.toArray();
+    // app.get('/user', async (req, res) => {
+    //   const query = {}
+    //   const cursor = crudCollection.find(query);
+    //   const result = await cursor.toArray();
+    //   res.send(result);
+      
+    // })
+
+    // app.post('/user', async (req, res) => {
+    //   const user = req.body;
+    //   const result = await crudCollection.insertOne(user);
+    //   res.send(result);
+    // })
+
+    // app.delete('/user/:id', async(req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: new mongoObjectId(id) }
+    //   console.log(query);
+    //   const result = await crudCollection.deleteOne(query);
+    //   res.send(result);
+    // })
+
+    //(update) put
+    app.put('/user/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedUser = req.body;
+      const query = { _id: new mongoObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          name: updatedUser.name,
+          email: updatedUser.email
+        },
+      };
+      const result = await crudCollection.updateOne(query, updatedDoc, options);
+      res.send(result);
+    })
+
+    //need user with specific id
+    app.get('/user/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = { _id: new mongoObjectId(id) }
+      const result = await crudCollection.findOne(query);
       res.send(result);
       
     })
 
+
+    //Delete 
+    app.delete('/user/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new mongoObjectId(id) };
+      const result = await crudCollection.deleteOne(query);
+      console.log(result); // result will be this { acknowledged: true, deletedCount: 1 }
+      res.send(result);
+    })
+
+
+    //(Read) get
+    app.get('/user', async (req, res)=>{
+      const query = {}
+      const cursor = crudCollection.find(query);
+      const result = await cursor.toArray()
+      res.send(result);
+    })
+
+    // (Create) post
     app.post('/user', async (req, res) => {
       const user = req.body;
       const result = await crudCollection.insertOne(user);
       res.send(result);
     })
 
-    app.delete('/user/:id', async (req, res) => {
-      const id = req.params.id;
-      const query={_id: mongoObjectId(id)}
-      const result = await crudCollection.deleteOne(query);
-      res.send(result);
-    })
+    
  
 
   } finally {
